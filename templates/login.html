@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+<title>{% block title %}Uniabuja Clinic | Login {% endblock %}</title>
+{% block content %}
+
+
+		<!-- START PAGE TITLE AREA -->
+		<div class="page-title-area bg-8">
+			<div class="container">
+				<div class="page-title-content">
+					<h2>Log In</h2>
+					<ul>
+						<li>
+							<a href="/">
+								Home 
+							</a>
+						</li>
+
+						<li>Pages</li>
+						<li class="active">Log In</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- END PAGE TITLE AREA -->
+
+		<!-- START LOG IN AREA -->
+		<section class="user-area-style log-in-area ptb-100">
+			<div class="container">
+				<div class="contact-form-action">
+					<div class="section-title">
+						<h2>Log In to your profile!</h2>
+						<p>Please enter your Reg number and password to log in.</p>
+					</div>
+					<form method="post" action="/login">
+						{% csrf_token %}
+						<div class="row">
+							<div class="col-12">
+								<div class="form-group">
+									<input class="form-control" type="text" name="username" placeholder="Username or Email">
+								</div>
+							</div>
+
+							<div class="col-12">
+								<div class="form-group">
+									<input class="form-control" type="password" name="pass1" placeholder="Password">
+								</div>
+							</div>
+
+							<div class="col-12">
+								<button class="default-btn btn-two" type="submit">
+									Log In Now
+								</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</section>
+		<!-- END LOG IN AREA -->
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+<title>{% block title %}Uniabuja Clinic | Appointment {% endblock %}</title>
+{% block content %}
+
+
+
+ 
+<div class="container">
+<div class="row">
+	<div class="col-sm-12">
+	
+		<table class="table">
+  <thead>
+
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Time</th>
+      
+      {% if user == 'P' %}
+      <th scope="col">Docter</th>
+      {% else %}
+      <th scope="col">Patient</th>
+      {% endif %}
+      <th scope="col">Status</th>
+
+    </tr>
+  </thead>
+  <tbody>
+  	  	{% for data in data %}
+    <tr>
+      <th scope="row">{{ data.date }}</th>
+      <td> {{ data.time }}</td>
+      {% if user == 'P' %}
+      <td> {{ data.docterid.name }} </td>
+      {% else %}
+      <td> {{ data.patientid.name }} </td>
+      {% endif %}
+
+
+      <!-- <td> {{ data.patientid.name }}</td> -->
+      {% if data.status %}
+      <td>Completed</td>
+      {% else %}
+      <td>Pending</td>
+      {% endif %}
+
+    </tr>
+    {% endfor %}
+   
+  </tbody>
+</table>
+
+  </div>
+</div>
+</div>
+{% endblock %}
