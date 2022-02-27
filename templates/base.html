@@ -99,22 +99,22 @@
 					<div class="main-nav">
 						<nav class="navbar navbar-expand-md">
 							<div class="container">
-								<a class="navbar-brand" href="">
-									<img src="{% static 'assets/img/logo.jpg' %}" alt="Logo">
-								</a>
+								{% if not status %}
+									<a class="navbar-brand" href="/">
+										<img src="{% static 'assets/img/logo.jpg' %}" alt="Logo">
+									</a>
+								{% else %}
+									<a class="navbar-brand" href="">
+										<img src="{% static 'assets/img/logo.jpg' %}" alt="Logo">
+									</a>
+								{% endif %}
 
 								<div class="collapse navbar-collapse mean-menu">
 									<ul class="navbar-nav m-auto">
-
-										{% if user == None %}
-											<li class="nav-item">
+										{% if not status %}
+										<li class="nav-item">
 												<a href="/" class="nav-link">Home</a>
 											</li>
-										{% else %}
-											<li class="nav-item">
-												<a href="#" class="nav-link">Home</a>
-											</li>
-										{% endif %}
 										<li class="nav-item">
 											<a href="/about" class="nav-link">About Us</a>
 										</li>
@@ -122,9 +122,8 @@
 										<li class="nav-item">
 											<a href="/contact" class="nav-link">Contact</a>
 										</li>
-										{% if not status %}
 											<li class="nav-item">
-												<a href="/register" class="nav-link">Signup</a>
+<!--												<a href="/register" class="nav-link">Signup</a>-->
 											</li>
 											<li class="nav-item">
 												<a href="/login" class="nav-link">Login</a>
@@ -133,13 +132,13 @@
 
 										{% if status and user == "P" %}
 											<li class="nav-item">
+												<a href="{% url 'profile' user=user %}" class="nav-link">Profile</a>
+											</li>
+											<li class="nav-item">
 												<a href="{% url 'myappointment' %}" class="nav-link">Appointments</a>
 											</li>
 											<li class="nav-item">
 <!--												<a href="{% url 'patient_invoice' %}" class="nav-link">Payments</a>-->
-											</li>
-											<li class="nav-item">
-												<a href="{% url 'profile' user=user %}" class="nav-link">Profile</a>
 											</li>
 											<li class="nav-item">
 <!--												<a href="{% url 'medical_history'  %}" class="nav-link">History</a>-->
@@ -152,13 +151,14 @@
 
 										{% if status and user == "D" %}
 											<li class="nav-item">
+												<a href="{% url 'profile' user=user %}" class="nav-link">Profile</a>
+											</li>
+
+											<li class="nav-item">
 												<a href="{% url 'docter_appointment'  %}" class="nav-link">Appointments</a>
 											</li>
 											<li class="nav-item">
 <!--												<a href="{% url 'docter_prescription'  %}" class="nav-link">Prescriptions</a>-->
-											</li>
-											<li class="nav-item">
-												<a href="{% url 'profile' user=user %}" class="nav-link">Profile</a>
 											</li>
 											<li class="nav-item">
 												<a href="/logout" class="nav-link">Logout</a>
@@ -167,7 +167,13 @@
 
 										{% if status and user == "R" %}
 											<li class="nav-item">
-												<a href="{% url 'receptionist_dashboard'  %}" class="nav-link">Dashboard</a>
+												<a href="{% url 'receptionist_dashboard' user=user %}" class="nav-link">Dashboard</a>
+											</li>
+											<li class="nav-item">
+												<a href="{% url 'create_appointment' user=user %}" class="nav-link">Create Appointment</a>
+											</li>
+											<li class="nav-item">
+												<a href="{% url 'create_patient'  %}" class="nav-link">Add Patient</a>
 											</li>
 											<li class="nav-item">
 												<a href="/logout" class="nav-link">Logout</a>
@@ -176,10 +182,10 @@
 
 										{% if status and user == "H" %}
 											<li class="nav-item">
-												<a href="{% url 'hr_dashboard'  %}" class="nav-link">Dashboard</a>
+												<a href="{% url 'hr_dashboard' user=user %}" class="nav-link">Dashboard</a>
 											</li>
 											<li class="nav-item">
-												<a href="{% url 'hr_accounting'  %}" class="nav-link">Accounting</a>
+												<a href="{% url 'hr_accounting' user=user %}" class="nav-link">Accounting</a>
 											</li>
 											<li class="nav-item">
 												<a href="/logout" class="nav-link">Logout</a>
@@ -188,13 +194,13 @@
 									</ul>
 
 									<!-- Start Other Option -->
-									<div class="others-option">
-										<div class="get-quote">
-											<a href="appointment.html" class="default-btn">
-												Get An Appointment
-											</a>
-										</div>
-									</div>
+<!--									<div class="others-option">-->
+<!--										<div class="get-quote">-->
+<!--											<a href="appointment.html" class="default-btn">-->
+<!--												Get An Appointment-->
+<!--											</a>-->
+<!--										</div>-->
+<!--									</div>-->
 									<!-- End Other Option -->
 								</div>
 							</div>
@@ -203,9 +209,15 @@
 
 					<!-- Menu For Mobile Device -->
 					<div class="mobile-nav">
-						<a href="" class="logo">
-							<img src="{% static 'assets/img/logo.jpg' %}" alt="Logo" width="50%">
-						</a>
+						{% if not status %}
+							<a href="/" class="logo">
+								<img src="{% static 'assets/img/logo.jpg' %}" alt="Logo" width="50%">
+							</a>
+						{% else %}
+							<a href="" class="logo">
+								<img src="{% static 'assets/img/logo.jpg' %}" alt="Logo" width="50%">
+							</a>
+						{% endif %}
 					</div>
 				</div>
 			</div>

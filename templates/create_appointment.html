@@ -1,32 +1,96 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Login</title>
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" >
-	<style type="text/css">
-		input,select{
-			width: 300px!important;
-			border-radius: 0px!important;
-		}
-		form{
-			margin: 50px auto;
-			width: 300px;
-			height: 450px;
-			text-align: center;
-		}
-		select{
-			height:30px;
-		}
-		button{
-			width: 140px;
-			border-radius: 0px!important;
-			margin-top: 20px;
-		}
-	</style>
-</head>
-<body>
-  {% include "nav.html" %}
+{% extends 'base.html' %}
+<title>{% block title %}Uniabuja Clinic | Create Appointment {% endblock %}</title>
+{% block content %}
+
+		<!-- START PAGE TITLE AREA -->
+		<div class="page-title-area bg-9">
+			<div class="container">
+				<div class="page-title-content">
+					<h2>Create Appointment</h2>
+					<ul>
+						<li>
+							<a href="">
+								Home
+							</a>
+						</li>
+
+						<li>Pages</li>
+						<li class="active">Create Appointment</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- END PAGE TITLE AREA -->
+
+		<!-- START Create Patient AREA -->
+		<section class="user-area-style log-in-area ptb-100">
+			<div class="container">
+				<div class="contact-form-action">
+					<div class="section-title">
+						<h2>Create Appointment!</h2>
+						<p>Fill form to create an appointment.</p>
+					</div>
+					<form action="{% url 'create_appointment' user=user %}" method="POST">
+						{% csrf_token %}
+						<div class="row">
+							<div class="col-lg-6 col-sm-12">
+								<div class="form-group">
+									<input class="form-control" type="date" name="date" placeholder="Appointment date">
+								</div>
+							</div>
+
+							<div class="col-lg-6 col-sm-12">
+								<div class="form-group">
+									<input class="form-control" type="time" name="time" placeholder="Appointment Time">
+								</div>
+							</div>
+
+							<div class="col-lg-6 col-sm-12">
+								<div class="form-group">
+									<div class="select-box">
+										<select class="form-control"  name="docter">
+											<option >Select Doctor</option>
+											{% for data in doctor_names %}
+												<option  value="{{ data.pk }}">{{ data.name }}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-6 col-sm-12">
+								<div class="form-group">
+									<div class="select-box">
+										<select class="form-control"  name="patient">
+											<option >Select Patient</option>
+											{% for data in patient_names %}
+												<option  value="{{ data.pk }}">{{ data.name }}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</div>
+							</div>
+
+
+							<div class="col-lg-6 col-sm-12">
+								<div class="form-group">
+
+
+								</div>
+							</div>
+
+
+							<div class="col-12">
+								<button class="default-btn btn-two" type="submit">
+									Create Appointment
+								</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</section>
+		<!-- END Create Patient AREA -->
 
 <!-- Form -->
 <div class="container">
@@ -37,11 +101,11 @@
  	<input type="text" name="time" placeholder="time" required="" class="form-control"><br>
  	 <div class="form-group">
   	<p align="left">Patient Name</p>
- <select name="patient" >
- 	{% for data in patient_names %}
-	   <option  value="{{ data.pk }}">{{ data.name }} </option>
-	     {% endfor %}
-	    </select><br>
+	 <select name="patient" >
+		{% for data in patient_names %}
+		   <option  value="{{ data.pk }}">{{ data.name }} </option>
+			 {% endfor %}
+	 </select><br>
   </div>
    <p align="left">Docter Name</p>
  <select name="docter" >
@@ -74,11 +138,4 @@
 
 
 
-
-
-<!--JS Library -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" ></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" ></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" ></script>
-</body>
-</html>
+{% endblock %}

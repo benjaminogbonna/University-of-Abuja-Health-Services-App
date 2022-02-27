@@ -1,143 +1,224 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Dashboard</title>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" >
-	<style type="text/css">
-		.card-body{
-			text-align: center;
-		}
-		.card{
-			height: 200px;
-		}
-		#hello{
-			width: 100%;
-		}
+{% extends 'base.html' %}
+<title>{% block title %}Uniabuja Clinic | Dashboard {% endblock %}</title>
+{% block content %}
 
-  
-	</style>
-	</head>
-<body>
- {% include "nav.html" %}
+<!-- START PAGE TITLE AREA -->
+		<div class="page-title-area bg-4">
+			<div class="container">
+				<div class="page-title-content">
+					<h2>Receptionist-Dashboard</h2>
+					<ul>
+						<li>
+							<a href="">
+								Home
+							</a>
+						</li>
+
+						<li>Pages</li>
+						<li class="active">Profile</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- END PAGE TITLE AREA -->
+
+		<!-- START Receptionist dashboard AREA -->
+        <section class="counter-area pt-100 pb-70 cart-area ptb-100">
+				<!-- Total counts-->
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-3 col-sm-6">
+						<div class="single-counter">
+							<i class="flaticon-doctor"></i>
+							<h2>
+								<span class="odometer" data-count="{{ total_doctors }}">00</span>
+								<span class="target">+</span>
+							</h2>
+							<p>Expert Doctors</p>
+						</div>
+					</div>
+
+					<div class="col-lg-3 col-sm-6">
+						<div class="single-counter">
+							<i class="bx bx-user-circle"></i>
+							<h2>
+								<span class="odometer" data-count="{{ total_patients }}">00</span>
+								<span class="target">+</span>
+							</h2>
+							<p>Patients</p>
+						</div>
+					</div>
+
+					<div class="col-lg-2 col-sm-6">
+						<div class="single-counter">
+							<i class="flaticon-personal-information"></i>
+							<h2>
+								<span class="odometer" data-count="{{ Total }}">00</span>
+								<span class="target">+</span>
+							</h2>
+							<p>Total Appointments</p>
+						</div>
+					</div>
+
+					<div class="col-lg-2 col-sm-6">
+						<div class="single-counter">
+							<i class="bx bx-check-circle"></i>
+							<h2>
+								<span class="odometer" data-count="{{ Done }}">00</span>
+								<span class="traget">+</span>
+							</h2>
+							<p>Completed Appointments</p>
+						</div>
+					</div>
+
+					<div class="col-lg-2 col-sm-6">
+						<div class="single-counter">
+							<i class="bx bx-certification"></i>
+							<h2>
+								<span class="odometer" data-count="{{ Pending }}">00</span>
+								<span class="traget">+</span>
+							</h2>
+							<p>Pending Appointments</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<br/>
+				<!-- Appointment Records-->
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12 col-md-12">
+						<h3>Appointment Records</h3>
+
+						<form>
+							<div class="cart-wraps">
+								<div class="cart-table table-responsive">
+									<table class="table table-bordered">
+										<thead>
+											<tr>
+												<th scope="col">Date</th>
+												<th scope="col">Time</th>
+												<th scope="col">Doctor</th>
+												<th scope="col">Patient</th>
+												<th scope="col">Status</th>
+												<th scope="col">Action</th>
+											</tr>
+										</thead>
+
+										<tbody>
+											{% for data in all_data %}
+
+											<tr>
+												<td>
+													<p>
+														{{ data.date }}
+													</p>
+												</td>
+
+												<td>
+													<p>{{ data.time }}</p>
+												</td>
+
+												<td>
+													<p>{{ data.docterid.name }}</p>
+												</td>
+
+												<td>
+													<p>{{ data.patientid.name }}</p>
+												</td>
+
+												<td>
+													{% if data.status %}
+														<p>Completed</p>
+													{% else %}
+														<p>Pending</p>
+													{% endif %}
+												</td>
+
+												<td>
+													<a class="btn btn-danger" href="{% url 'update_status' id=data.id %}">Done</a>
+												</td>
+											</tr>
+										{% endfor %}
+
+										</tbody>
+									</table>
+								</div>
 
 
+							</div>
+
+						</form>
+					</div>
+				</div>
+			</div>
+			<br/>
+				<!-- Patient Records-->
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12 col-md-12">
+						<h3>Patient Records</h3>
+
+						<form>
+							<div class="cart-wraps">
+								<div class="cart-table table-responsive">
+									<table class="table table-bordered">
+										<thead>
+											<tr>
+												<th scope="col">Name</th>
+												<th scope="col">Card No.</th>
+												<th scope="col">Gender</th>
+												<th scope="col">Phone/Email</th>
+												<th scope="col">Update</th>
+												<th scope="col">Action</th>
+											</tr>
+										</thead>
+
+										<tbody>
+											{% for data in all_patient %}
+
+											<tr>
+												<td>
+													<p>{{ data.name }}</p>
+												</td>
+
+												<td>
+													<p>{{ data.card_number }}</p>
+												</td>
+
+												<td>
+													<p>{{ data.gender }}</p>
+												</td>
+
+												<td>
+													<p>
+														{{ data.phone }} -
+														{{ data.email }}
+													</p>
+												</td>
+
+												<td>
+													<a class="btn btn-primary" href="{% url 'update_patient' id=data.id %}" >Update</a>
+												</td>
+
+												<td>
+													<a class="btn btn-danger" href="{% url 'delete_patient' id=data.id %}" >Delete</a>
+												</td>
+											</tr>
+										{% endfor %}
+
+										</tbody>
+									</table>
+								</div>
 
 
- <div class="card-group">
-  <div class="card">
-  
-    <div class="card-body bg-light">
-      <h5 class="card-title">Total Appointments</h5>
-      <h5>{{ Total }}</h5>
-      
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-body bg-success">
-      <h5 class="card-title"> Appointments Done</h5>
-      <h5>{{ Done }}</h5>
+							</div>
 
-    	
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-body bg-primary">
-      <h5 class="card-title">Upcoming Appointments</h5>
-      <h5>{{ Pending }}</h5>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- END Receptionist dashboard AREA -->
 
-      
-    </div>
-  </div>
-</div>
-<br>
-
-<div class="container">
-<div class="row">
-	<div class="col-sm">
-		<a href="{% url 'create_appointment' user=user %}" class="btn btn-primary" id="hello">Create Appointment</a>
-		<table class="table">
-  <thead>
-
-    <tr>
-      <th scope="col">Date</th>
-      <th scope="col">Time</th>
-      <th scope="col">Docter</th>
-      <th scope="col">Patient</th>
-      <th scope="col">Status</th>
-      <th scope="col">Action</th>
-
-    </tr>
-  </thead>
-  <tbody>
-  	  	{% for data in all_data %}
-    <tr>
-      <th scope="row">{{ data.date }}</th>
-      <td> {{ data.time }}</td>
-      <td> {{ data.docterid.name }} </td>
-      <td> {{ data.patientid.name }}</td>
-      {% if data.status %}
-      <td>Completed</td>
-      {% else %}
-      <td>Pending</td>
-      {% endif %}
-      <td> <a   class="btn btn-danger" href="{% url 'update_status' id=data.id %}">Done</td>
-
-
-    </tr>
-    {% endfor %}
-   
-  </tbody>
-</table>
-	</div>
-
-
-  <!-- Last patients -->
-  <div class="col-sm">
-    <a href="{% url 'create_patient'  %}" class="btn btn-primary" id="hello">Create Patient</a>
-    <table class="table">
-  <thead>
-
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Phone</th>
-      <th scope="col">Email</th>
-      <th scope="col">Gender</th>
-      <th scope="col">Age</th>
-
-
-
-    </tr>
-  </thead>
-  <tbody>
-        {% for data in last_patients %}
-    <tr>
-      
-      <td> {{ data.name }}</td>
-      <td> {{ data.phone }} </td>
-      <td> {{ data.email }}</td>
-      <td> {{ data.gender }}</td>
-      <td> {{ data.age }}</td>
-
-
-
-            <td scope="col"><a class="btn btn-primary" href="{% url 'update_patient' id=data.id %}" >Update</a></td>
-      <td scope="col"><a class="btn btn-danger" href="{% url 'delete_patient' id=data.id %}" >Delete</a></td>
-
-    </tr>
-    {% endfor %}
-
-
-
-
-
-  </tbody>
-
-</table>
-  </div>
-</div>
-</div>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" ></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" ></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" ></script>
-</body>
-</html>
+{% endblock %}

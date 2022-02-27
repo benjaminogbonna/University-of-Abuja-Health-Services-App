@@ -18,7 +18,7 @@ class Docter(models.Model):
 	department = models.CharField(max_length=30, blank=True, default='')
 
 	def __str__(self):
-		return f'{self.name}, {self.username}'
+		return f'{self.name}'
 
 	
 # Prescription Model

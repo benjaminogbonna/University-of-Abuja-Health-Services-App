@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views.generic import View
@@ -39,11 +40,9 @@ def contact(request):
 
 def register(request):
     if request.method == 'POST':
-        print(request.POST['name'])
-        print(request.POST['post'])
         try:
             user = User.objects.get(username=request.POST['username'])
-            print(user)
+
             return render(request, 'register.html')
         except User.DoesNotExist:
             user = User.objects.create_user(username=request.POST['username'], password=request.POST['pass1'])
@@ -62,7 +61,6 @@ def register(request):
                 new.save()
                 return render(request, 'register.html')
 
-            print('Registered Successfully')
             return render(request, 'register.html')
     else:
         return render(request, 'register.html')
@@ -97,7 +95,7 @@ def login(request):
                             try:
                                 data = HR.objects.get(username=user)
                                 auth.login(request, user_authenticate)
-                                return redirect('dashboard', user="H")
+                                return redirect('hr_dashboard', user="H")
                             except:
                                 return redirect('/')
 
@@ -115,17 +113,16 @@ def logout(request):
 
 
 # Profile
+@login_required()
 def profile(request, user):
-    print(request.user)
     userid = User.objects.get(username=request.user)
     status = False
     if request.user:
         status = request.user
     if request.method == "POST":
-        print(request.POST['name'])
         if user == "P":
             update = Patient.objects.get(username=userid)
-            update.name = request.POST['name']
+            # update.name = request.POST['name']
             update.phone = request.POST['phone']
             update.email = request.POST['email']
             update.gender = request.POST['gender']
@@ -134,7 +131,6 @@ def profile(request, user):
             update.address = request.POST['address']
             update.department = request.POST['department']
             update.level = request.POST['level']
-            # update.case = request.POST['case']
             try:
                 myfile = request.FILES['report']
                 fs = FileSystemStorage(location='media/report/')
@@ -164,11 +160,15 @@ def profile(request, user):
         userdata = Docter.objects.get(username=userid)
         return render(request, 'docter_profile.html', {'userdata': userdata, 'user': user, "status": status})
 
+    # elif user == 'H':
+    #     userdata = HR.objects.get(username=userid)
+    #     return render(request, 'hr_dashboard.html', {'userdata': userdata, 'user': user, "status": status})
+
     return redirect('/')
 
 
+@login_required()
 def dashboard(request, user):
-    print(user)
     status = False
     if request.user:
         status = request.user
@@ -178,19 +178,46 @@ def dashboard(request, user):
     return render(request, 'patient_profile.html', {'user': user, "status": status})
 
 
+@login_required()
 def receptionist_dashboard(request, user):
     status = False
     if request.user:
         status = request.user
-    row = Appointment.objects.all()
+    row = Appointment.objects.all().order_by('-pk')
+    total_doctors = len(Docter.objects.all())
+    total_patients = len(Patient.objects.all())
     status_done = len(Appointment.objects.filter(status=1))
     status_pending = len(row) - status_done
-    last_patients = Patient.objects.all().order_by('-pk')[0:5]
-    print(last_patients)
-    return render(request, 'receptionist_dashboard.html', {'user': user, "status": status, "Total": len(row),
-                                                           "Done": status_done, "Pending": status_pending,
-                                                           'all_data': row, 'last_patients': last_patients})
+    all_patient = Patient.objects.all().order_by('-pk')
+    context = {'user': user,
+               "status": status,
+               "Total": len(row),
+               "Done": status_done,
+               "Pending": status_pending,
+               'all_data': row,
+               'all_patient': all_patient,
+               'total_patients': total_patients,
+               'total_doctors': total_doctors,
+               }
+    return render(request, 'receptionist_dashboard.html', context)
 
+
+@login_required()
+def hr_dashboard(request, user):
+    status = False
+    if request.user:
+        status = request.user
+    all_p = Patient.objects.all()
+    all_d = Docter.objects.all()
+    active_d = Docter.objects.filter(status=1)
+    context = {'user': user,
+               "all_p": len(all_p),
+               "all_d": len(all_d),
+               "all_data": all_d,
+               "active_d": len(active_d),
+               'status': status
+               }
+    return render(request, 'hr_dashboard.html', context)
 
 def create_appointment(request, user):
     status = False
@@ -198,14 +225,12 @@ def create_appointment(request, user):
         status = request.user
 
     if request.method == "POST":
-        print(type(request.POST['docter']))
         d_id = int(request.POST['docter'])
         p_id = int(request.POST['patient'])
 
         docter = Docter.objects.get(pk=d_id)
         patient = Patient.objects.get(pk=p_id)
 
-        print(d_id, type(d_id))
         p_id = int(request.POST['patient'])
         status = int(request.POST['status'])
         new_appointment = Appointment(docterid=docter, patientid=patient, time=request.POST['time'],
@@ -214,10 +239,14 @@ def create_appointment(request, user):
         return redirect('receptionist_dashboard', user="R")
 
     patient_names = Patient.objects.all()
-    docter_names = Docter.objects.all()
+    doctor_names = Docter.objects.all()
+    context = {'user': user,
+               "status": status,
+               "patient_names": patient_names,
+               "doctor_names": doctor_names
+               }
 
-    return render(request, 'create_appointment.html', {'user': user, "status": status, "patient_names": patient_names,
-                                                       "docter_names": docter_names})
+    return render(request, 'create_appointment.html', context)
 
 
 # Delete Patient
@@ -238,28 +267,40 @@ def create_patient(request):
             print(user)
             return redirect('receptionist_dashboard', user="R")
         except User.DoesNotExist:
-
             user = User.objects.create_user(username=request.POST['username'], password='default')
             try:
                 myfile = request.FILES['report']
                 fs = FileSystemStorage(location='media/report/')
                 filename = fs.save(myfile.name, myfile)
-                # print(name,file)
                 url = fs.url(filename)
 
             except:
                 url = ""
-            new = Patient(phone=request.POST['phone'], name=request.POST['name'], email=request.POST['email'],
-                          username=user, age=request.POST['age'], address=request.POST['address'],
-                          gender=request.POST['gender'], blood=request.POST['blood'], case=request.POST['case'],
-                          medical=url)
+            new = Patient(username=user,
+                          # username=request.POST['username'],
+                          name=request.POST['name'],
+                          card_number=request.POST['card_number'],
+                          email=request.POST['email'],
+                          phone=request.POST['phone'],
+                          gender=request.POST['gender'],
+                          age=request.POST['age'],
+                          blood=request.POST['blood'],
+                          department=request.POST['department'],
+                          level=request.POST['level'],
+                          address=request.POST['address'],
+                          medical_report=url,
+                          )
             new.save()
+            print(new)
 
-            c_patient = Invoice(patient=new, outstanding=request.POST['outstanding'], paid=request.POST['paid'])
+            c_patient = Invoice(patient=new, outstanding=2, paid=5)
             c_patient.save()
             return redirect('receptionist_dashboard', user="R")
-
-    return render(request, 'create_patient.html', {'user': "R", 'status': status})
+    users = User.objects.all().order_by('-pk')
+    context = {'user': "R",
+               'status': status,
+               'users': users}
+    return render(request, 'create_patient.html', context)
 
 
 # Update Patient=> Receptionist
@@ -309,8 +350,6 @@ def myappointment(request):
     return render(request, 'my_appointment.html', {'data': data, 'user': "P", 'status': status})
 
 
-# Docter Appointsments
-
 def docter_appointment(request):
     status = False
     if request.user:
@@ -321,8 +360,6 @@ def docter_appointment(request):
 
     return render(request, 'my_appointment.html', {'data': data, 'user': "D", 'status': status})
 
-
-# Docter Prescription
 
 def docter_prescription(request):
     status = False
@@ -360,8 +397,6 @@ def create_prescription(request):
     return render(request, 'create_prescription.html', {"data": data, 'user': "D", 'status': status})
 
 
-# Mediacal History
-
 def medical_history(request):
     status = False
     if request.user:
@@ -374,7 +409,6 @@ def medical_history(request):
     return render(request, 'medical_history.html', {"data": data, 'user': "P", 'status': status})
 
 
-# Update Status
 def update_status(request, id):
     print(id)
     status = False
@@ -394,20 +428,19 @@ def update_status(request, id):
     return render(request, 'update_status.html', {'user': "R", "id": id, 'status': status})
 
 
-# HR Dashboard
-def hr_dashboard(request):
-    status = False
-    if request.user:
-        status = request.user
-    all_p = Patient.objects.all()
-    all_d = Docter.objects.all()
-    active_d = Docter.objects.filter(status=1)
-    return render(request, 'hr_dashboard.html',
-                  {"all_p": len(all_p), "all_d": len(all_d), "all_data": all_d, "active_d": len(active_d), 'user': "H",
-                   'status': status})
+@login_required()
+# def hr_dashboard(request):
+#     status = False
+#     if request.user:
+#         status = request.user
+#     all_p = Patient.objects.all()
+#     all_d = Docter.objects.all()
+#     active_d = Docter.objects.filter(status=1)
+#     return render(request, 'hr_dashboard.html',
+#                   {"all_p": len(all_p), "all_d": len(all_d), "all_data": all_d, "active_d": len(active_d), 'user': "H",
+#                    'status': status})
 
 
-# => Docter Update
 def update_docter(request, id):
     status = False
     if request.user:
@@ -431,12 +464,10 @@ def update_docter(request, id):
     return render(request, 'update_docter.html', {"userdata": data, 'user': "H", 'status': status})
 
 
-# Docter Delete
 def delete_docter(request):
     return HttpResponse('<h2 style="color:red">You are Not authorized</h2>')
 
 
-# HR Accounting
 def hr_accounting(request):
     status = False
     if request.user:
@@ -448,7 +479,6 @@ def hr_accounting(request):
                   {'individual': individual, 'consulation': consulation, 'user': 'H', 'status': status})
 
 
-# Patient invoice
 def patient_invoice(request):
     status = False
     if request.user:
@@ -459,7 +489,6 @@ def patient_invoice(request):
     return render(request, 'patient_invoice.html', {'data': data, 'user': 'P', 'status': status})
 
 
-#  Invoice Generator
 def get_pdf(request, id):
     data = Prescription2.objects.get(id=id)
     pdf_data = {'data': data}
@@ -473,7 +502,6 @@ def get_pdf(request, id):
         return HttpResponse('Error')
 
 
-# Send Reminder
 def send_reminder(request, id):
     p = Prescription2.objects.get(id=id)
     email = p.patient.email
