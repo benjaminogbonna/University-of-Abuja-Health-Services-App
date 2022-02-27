@@ -31,6 +31,10 @@ def about(request):
     return render(request, 'about.html')
 
 
+def staff(request):
+    return render(request, 'staff.html')
+
+
 def contact(request):
     status = False
     if request.user:

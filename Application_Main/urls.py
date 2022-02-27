@@ -23,11 +23,12 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Home Page
-    path('', home , name = 'home' ),
-    path('register', register , name = 'register' ),
-    path('login', login , name = 'login' ),
-    path('about', about , name = 'about' ),
-    path('contact', contact, name = 'contact' ),
+    path('', home, name='home'),
+    path('register', register, name='register'),
+    path('login', login, name='login'),
+    path('about', about, name='about'),
+    path('staffs', staff, name='staffs'),
+    path('contact', contact, name='contact'),
 
     path('logout', logout, name='logout'),
     # path('logout', auth_views.LogoutView.as_view(), name = 'logout' ),
